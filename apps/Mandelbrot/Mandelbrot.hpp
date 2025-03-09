@@ -72,9 +72,6 @@ auto Mandelbrot(size_t height, size_t width, Colormap colormap) -> Tensor<uint8_
 
 auto MandelbrotSimd(size_t height, size_t width, Colormap colormap) -> Tensor<uint8_t, 3>
 {
-    static constexpr float k_bailout_radius = 2.0f;
-    static constexpr int k_max_iterations   = 1000;
-
     // Complex-plane bounds
     const float real_start = -2.5f;
     const float real_stop  = 1.0f;
