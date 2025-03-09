@@ -36,22 +36,22 @@ int main(int argc, char* argv[])
 
     // Map string -> enum
     Colormap colormapChoice;
-    if (colormapStr == "plasma")
-    {
-        colormapChoice = Colormap::Plasma;
-    }
-    else if (colormapStr == "inferno")
-    {
-        colormapChoice = Colormap::Inferno;
-    }
-    else if (colormapStr == "magma")
+    if (colormapStr == "magma")
     {
         colormapChoice = Colormap::Magma;
     }
+    else if (colormapStr == "twilight")
+    {
+        colormapChoice = Colormap::Twilight;
+    }
+    else if (colormapStr == "viridis")
+    {
+        colormapChoice = Colormap::Viridis;
+    }
     else
     {
-        std::cerr << "Unknown colormap \"" << colormapStr << "\", defaulting to plasma.\n";
-        colormapChoice = Colormap::Plasma;
+        std::cerr << "Unknown colormap \"" << colormapStr << "\", defaulting to viridis.\n";
+        colormapChoice = Colormap::Viridis;
     }
 
     // Render parameters
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
     const size_t height = 2160;
 
     // Generate the fractal
-    auto rgb = GenerateMandelbrotImage(height, width, colormapChoice);
+    auto rgb = Mandelbrot(height, width, colormapChoice);
 
     EncodePng(outputPath, rgb);
 
