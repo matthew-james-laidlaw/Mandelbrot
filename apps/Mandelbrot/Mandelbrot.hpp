@@ -2,75 +2,117 @@
 
 #include <Dispatch.hpp>
 #include <Tensor.hpp>
-
 #include "ColorMap.hpp"
-
 #include <complex>
+#include <vector>
+#include <cmath>
+#include <algorithm>
 
-auto GenerateMandelbrot(size_t height, size_t width) -> Tensor<float, 2>
+// Compute the Mandelbrot set with continuous (smooth) coloring and build a histogram.
+auto MandelbrotSmoothHistogram(size_t height, size_t width) -> Tensor<float, 2>
 {
-    size_t maxIterations = 200;
+    const size_t max_iterations = 1000;
+    const float real_start = -2.5f;
+    const float real_stop  = 1.0f;
+    const float imag_start = -1.0f;
+    const float imag_stop  = 1.0f;
 
-    Tensor<float, 2> intensity({height, width}, 0.0f);
+    Tensor<float, 2> smooth({height, width});
 
-    const double realMin = -2.5, realMax = 1.0;
-    const double imagMin = -1.0, imagMax = 1.0;
-
-    Dispatch2d(height, width, [&](size_t y, size_t x)
+    // First pass: Compute smooth iteration counts.
+    Dispatch(height, width, [&](size_t y, size_t x)
     {
-        double real = realMin + (static_cast<double>(x) / (width - 1)) * (realMax - realMin);
-        double imag = imagMin + (static_cast<double>(y) / (height - 1)) * (imagMax - imagMin);
-
-        std::complex<double> c(real, imag);
-        std::complex<double> z(0.0, 0.0);
+        // Map pixel coordinate to Mandelbrot plane.
+        float real = real_start + (static_cast<float>(x) / (width - 1)) * (real_stop - real_start);
+        float imag = imag_start + (static_cast<float>(y) / (height - 1)) * (imag_stop - imag_start);
+        std::complex<float> c(real, imag);
+        std::complex<float> z(0.0f, 0.0f);
 
         size_t iteration = 0;
-        while (std::abs(z) < 2.0 && iteration < maxIterations)
+        while (std::abs(z) < 2.0f && iteration < max_iterations)
         {
             z = z * z + c;
             ++iteration;
         }
 
-        if (iteration < maxIterations)
+        if (iteration < max_iterations)
         {
-            double absz = std::abs(z);
-            if (absz == 0.0)
-            {
-                absz = 1e-10;
-            }
-
-            double mu = iteration - std::log(std::log(absz)) / std::log(2.0);
-
-            intensity(y, x) = mu / static_cast<double>(maxIterations);
+            // Compute smooth (continuous) iteration count.
+            // Note: std::abs(z) is guaranteed to be >=2 here.
+            float nu = std::log(std::log(std::abs(z))) / std::log(2.0f);
+            smooth(y, x) = iteration + 1 - nu;
         }
         else
         {
-            intensity(y, x) = 0.0;
+            smooth(y, x) = static_cast<float>(iteration);
         }
     });
 
-    return intensity;
+    // Build histogram for escaped points (those with iteration < max_iterations).
+    std::vector<size_t> histogram(max_iterations, 0);
+    size_t total = 0;
+    for (size_t y = 0; y < height; ++y)
+    {
+        for (size_t x = 0; x < width; ++x)
+        {
+            float value = smooth(y, x);
+            if (value < max_iterations)  // pixel escaped
+            {
+                // Use the integer part (floor) of the smooth value for histogram binning.
+                size_t bin = std::min(max_iterations - 1, static_cast<size_t>(value));
+                histogram[bin]++;
+                total++;
+            }
+        }
+    }
+
+    // Compute the cumulative histogram (CDF).
+    std::vector<double> cumulative(histogram.size(), 0.0);
+    double sum = 0.0;
+    for (size_t i = 0; i < histogram.size(); ++i)
+    {
+        sum += histogram[i];
+        cumulative[i] = sum;
+    }
+
+    // Second pass: Remap each smooth value to a normalized value using the histogram.
+    Dispatch(height, width, [&](size_t y, size_t x)
+    {
+        float value = smooth(y, x);
+        if (value < max_iterations)
+        {
+            size_t bin = std::min(max_iterations - 1, static_cast<size_t>(value));
+            // Calculate normalized hue based on the cumulative distribution.
+            double hue = cumulative[bin];
+            // Add fractional contribution from the current bin.
+            hue += (value - bin) * histogram[bin];
+            hue /= total;  // Normalize to [0,1]
+            smooth(y, x) = static_cast<float>(hue);
+        }
+        else
+        {
+            // Points inside the Mandelbrot set.
+            smooth(y, x) = 0.0f;
+        }
+    });
+
+    return smooth;
 }
 
+// Generate the Mandelbrot image using the remapped values from histogram coloring.
 auto GenerateMandelbrotImage(size_t height, size_t width, Colormap colormap) -> Tensor<uint8_t, 3>
 {
-    auto intensity = GenerateMandelbrot(height, width);
-    Tensor<uint8_t, 3> rgb({height, width, 3}, 0);
+    // Get the normalized, histogram-equalized values.
+    auto intensity = MandelbrotSmoothHistogram(height, width);
+    Tensor<uint8_t, 3> rgb({height, width, 3});
 
-    const double gamma = 1.0;
-
-    Dispatch2d(height, width, [&](size_t y, size_t x)
+    Dispatch(height, width, [&](size_t y, size_t x)
     {
-        double t = intensity(y, x);
-
-        t = std::pow(t, gamma);
-        t = std::clamp(t, 0.0, 1.0);
-
-        Color col = getColorFromColormap(colormap, t);
-
-        rgb(y, x, 0) = static_cast<unsigned char>(std::clamp(col.r * 255.0, 0.0, 255.0));
-        rgb(y, x, 1) = static_cast<unsigned char>(std::clamp(col.g * 255.0, 0.0, 255.0));
-        rgb(y, x, 2) = static_cast<unsigned char>(std::clamp(col.b * 255.0, 0.0, 255.0));
+        // Color color = getColorFromColormap(colormap, intensity(y, x));
+        Color color = magma32[static_cast<size_t>(std::clamp(intensity(y, x) * 255.0, 0.0, 255.0))];
+        rgb(y, x, 0) = static_cast<unsigned char>(std::clamp(color.r * 255.0, 0.0, 255.0));
+        rgb(y, x, 1) = static_cast<unsigned char>(std::clamp(color.g * 255.0, 0.0, 255.0));
+        rgb(y, x, 2) = static_cast<unsigned char>(std::clamp(color.b * 255.0, 0.0, 255.0));
     });
 
     return rgb;

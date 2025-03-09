@@ -55,15 +55,13 @@ int main(int argc, char* argv[])
     }
 
     // Render parameters
-    const size_t width  = 3840 * 4; // 4K resolution
-    const size_t height = 2160 * 4;
+    const size_t width  = 3840; // 4K resolution
+    const size_t height = 2160;
 
     // Generate the fractal
     auto rgb = GenerateMandelbrotImage(height, width, colormapChoice);
 
-    // Write out the PPM
-    EncodePpm(outputPath, rgb);
-    EncodePng(outputPath + ".png", rgb);
+    EncodePng(outputPath, rgb);
 
     return 0;
 }
