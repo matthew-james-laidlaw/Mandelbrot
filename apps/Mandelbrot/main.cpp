@@ -1,67 +1,58 @@
 #include "argparse/argparse.hpp"
 
-#include "Mandelbrot.hpp"
-
 #include <PNG.hpp>
-#include <PPM.hpp>
 #include <Tensor.hpp>
 
-int main(int argc, char* argv[])
+#include "Mandelbrot.hpp"
+#include "Time.hpp"
+
+auto Main(int argc, char** argv) -> int
 {
-    argparse::ArgumentParser program("mandelbrot_generator_colormap");
+    argparse::ArgumentParser program("mandelbrot");
 
-    // Positional argument for output file
     program.add_argument("output")
-        .help("Path for the .ppm file to be saved");
+        .help("Path for the .png file to be saved");
 
-    // Optional argument for colormap
     program.add_argument("--colormap")
-        .default_value(std::string("plasma"))
-        .help("Which colormap to use: plasma, inferno, or magma");
+        .default_value(std::string("magma"))
+        .help("Which colormap to use: magma, twilight, or viridis");
 
-    try
-    {
-        program.parse_args(argc, argv);
-    }
-    catch (const std::runtime_error& err)
-    {
-        std::cerr << err.what() << "\n";
-        std::cerr << program;
-        return 1;
-    }
+    program.parse_args(argc, argv);
 
-    // Get user choices from CLI
-    std::string outputPath  = program.get<std::string>("output");
-    std::string colormapStr = program.get<std::string>("--colormap");
+    auto output_path   = program.get<std::string>("output");
+    auto colormap_name = program.get<std::string>("--colormap");
 
-    // Map string -> enum
-    Colormap colormapChoice;
-    if (colormapStr == "magma")
-    {
-        colormapChoice = Colormap::Magma;
-    }
-    else if (colormapStr == "twilight")
-    {
-        colormapChoice = Colormap::Twilight;
-    }
-    else if (colormapStr == "viridis")
-    {
-        colormapChoice = Colormap::Viridis;
-    }
-    else
-    {
-        std::cerr << "Unknown colormap \"" << colormapStr << "\", defaulting to viridis.\n";
-        colormapChoice = Colormap::Viridis;
-    }
+    auto colormap = GetColormapByName(colormap_name);
 
-    // Render parameters
-    const size_t width  = 3840; // 4K resolution
+    // 4k resolution
     const size_t height = 2160;
+    const size_t width  = 3840;
 
-    // Generate the fractal
-    auto rgb = Mandelbrot(height, width, colormapChoice);
-
-    EncodePng(outputPath, rgb);
+    auto [mandelbrot, mandelbrot_elapsed] = Time([&]()
+    {
+        return Mandelbrot(height, width, colormap);
+    });
+    std::cout << "Mandelbrot Generation: " << mandelbrot_elapsed.count() << "s" << std::endl;
+    
+    auto encode_elapsed = Time([&]()
+    {
+        EncodePng(output_path, mandelbrot);
+    });
+    
+    std::cout << "PNG Encoding:          " << encode_elapsed.count() << "s" << std::endl;
 
     return 0;
+}
+
+auto main(int argc, char** argv) -> int
+{
+    try
+    {
+        return Main(argc, argv);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+        return 1;
+    }
 }

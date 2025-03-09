@@ -4,7 +4,30 @@
 #include "ColorMapData/Twilight.hpp"
 #include "ColorMapData/Viridis.hpp"
 
-auto GetColormap(Colormap colormap) -> Palette
+#include <iostream>
+
+auto GetColormapByName(std::string const& name) -> Colormap
+{
+    if (name == "magma")
+    {
+        return Colormap::Magma;
+    }
+    else if (name == "twilight")
+    {
+        return Colormap::Twilight;
+    }
+    else if (name == "viridis")
+    {
+        return Colormap::Viridis;
+    }
+    else
+    {
+        std::cerr << "no colormap (or invalid colormap) requested, defaulting to magma" << std::endl;
+        return Colormap::Magma;
+    }
+}
+
+auto GetColormapPalette(Colormap colormap) -> Palette
 {
     switch (colormap)
     {
@@ -15,6 +38,6 @@ auto GetColormap(Colormap colormap) -> Palette
     case Colormap::Viridis:
         return viridis256;
     default:
-        return viridis256;
+        return magma256;
     }
 }

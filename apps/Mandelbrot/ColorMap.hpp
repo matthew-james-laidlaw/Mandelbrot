@@ -2,6 +2,8 @@
 
 #include "ColorMapData/Palette.hpp"
 
+#include <string>
+
 enum class Colormap
 {
     Magma,
@@ -9,4 +11,5 @@ enum class Colormap
     Viridis,
 };
 
-auto GetColormap(Colormap colormap) -> Palette;
+auto GetColormapByName(std::string const& name) -> Colormap;
+auto GetColormapPalette(Colormap colormap) -> Palette;

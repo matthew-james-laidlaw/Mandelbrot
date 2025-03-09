@@ -8,4 +8,5 @@ A (mostly completely self-implemented) library providing a tensor class supporti
 * The class is generic where possible, and when it is not, template specializations define how operations are defined for that order. One example is indexing. Generically finding a linear index into a 1D, 2D, or 3D tensor would be more computationally intensive than just applying the arithmetic needed to find a linear index for the given order. Thus, a template specialization exists for each case.
 
 # Resources
+* [Mandelbrot Plotting Algorithms](https://en.wikipedia.org/wiki/Plotting_algorithms_for_the_Mandelbrot_set#Continuous_(smooth)_coloring)
 * [CMake Project Structure Convention](https://cliutils.gitlab.io/modern-cmake/chapters/basics/structure.html)
