@@ -250,7 +250,16 @@ auto MandelbrotSSE(size_t height, size_t width, Colormap colormap) -> Tensor<uin
 
     return mandelbrot;
 #else
-    throw std::runtime_error("this binary was not compiled with SSE2 support");
+    throw std::runtime_error("this binary was not compiled with SSE support");
+#endif
+}
+
+auto MandelbrotNEON(size_t height, size_t width, Colormap colormap) -> Tensor<uint8_t, 3>
+{
+#if __SUPPORTS_NEON__
+    throw std::runtime_error("NEON not implemented");
+#else
+    throw std::runtime_error("this binary was not compiled with NEON support");
 #endif
 }
 
@@ -260,6 +269,11 @@ auto Mandelbrot(size_t height, size_t width, Colormap colormap) -> Tensor<uint8_
     {
         std::cout << "Running Mandelbrot with SSE instruction set." << std::endl;
         return MandelbrotSSE(height, width, colormap);
+    }
+    else if (SupportsNEON())
+    {
+        std::cout << "Running Mandelbrot with NEON instruction set." << std::endl;
+        return MandelbrotNEON(height, width, colormap);
     }
     else
     {
