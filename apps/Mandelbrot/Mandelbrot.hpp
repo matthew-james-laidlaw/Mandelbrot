@@ -1,11 +1,10 @@
 #pragma once
 
-
 #include <Dispatch.hpp>
 #include <Tensor.hpp>
 
-#include "InstructionSet.hpp"
 #include "ColorMap.hpp"
+#include "InstructionSet.hpp"
 
 static constexpr size_t k_max_iterations = 100;
 

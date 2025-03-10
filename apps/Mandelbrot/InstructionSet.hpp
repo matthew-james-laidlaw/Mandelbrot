@@ -2,20 +2,20 @@
 #include <stdint.h>
 
 #if defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86)
-    #if defined(__SSE__) || defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 1)
-        #define __SUPPORTS_SSE__ 1
-    #else
-        #define __SUPPORTS_SSE__ 0
-    #endif
+#if defined(__SSE__) || defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 1)
+#define __SUPPORTS_SSE__ 1
 #else
-    #define __SUPPORTS_SSE__ 0
+#define __SUPPORTS_SSE__ 0
+#endif
+#else
+#define __SUPPORTS_SSE__ 0
 #endif
 
 #if defined(__ARM_NEON) || defined(__ARM_NEON__) || \
     (defined(_M_ARM64) || defined(__aarch64__))
-    #define __SUPPORTS_NEON__ 1
+#define __SUPPORTS_NEON__ 1
 #else
-    #define __SUPPORTS_NEON__ 0
+#define __SUPPORTS_NEON__ 0
 #endif
 
 #if defined(__APPLE__)
@@ -24,7 +24,7 @@
 #include <unistd.h>
 
 #if __SUPPORTS_SSE__
-    #include <emmintrin.h>
+#include <emmintrin.h>
 #endif
 
 bool SupportsSSE_Apple()
@@ -50,9 +50,9 @@ bool SupportsNEON_Apple()
 #include <unistd.h>
 
 #if __SUPPORTS_SSE__
-    #include <emmintrin.h>
+#include <emmintrin.h>
 #elif __SUPPORTS_NEON__
-    #include <arm_neon.h>
+#include <arm_neon.h>
 #endif
 
 bool SupportsSSE_Linux()

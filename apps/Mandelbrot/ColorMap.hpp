@@ -4,8 +4,8 @@
 #include "ColorMapData/Twilight.hpp"
 #include "ColorMapData/Viridis.hpp"
 
-#include <string>
 #include <iostream>
+#include <string>
 
 enum class Colormap
 {
