@@ -181,7 +181,7 @@ auto ElementwiseBinaryOperation(Tensor<T1, 2> const& left, Tensor<T2, 2> const& 
     using ResultType = std::common_type_t<T1, T2>;
     Tensor<ResultType, 2> result(left.Shape(), 0);
     Operation operation;
-    Dispatch(left.Shape()[0], left.Shape()[1], [&](size_t y, size_t x)
+    DispatchElement(left.Shape()[0], left.Shape()[1], [&](size_t y, size_t x)
     {
         result(y, x) = operation(left(y, x), right(y, x));
     });
@@ -194,7 +194,7 @@ auto ElementwiseScalarOperation(Tensor<T1, 2> const& left, T2 right)
     using ResultType = std::common_type_t<T1, T2>;
     Tensor<ResultType, 2> result(left.Shape());
     Operation operation;
-    Dispatch(left.Shape()[0], left.Shape()[1], [&](size_t y, size_t x)
+    DispatchElement(left.Shape()[0], left.Shape()[1], [&](size_t y, size_t x)
     {
         result(y, x) = operation(left(y, x), right);
     });
@@ -207,7 +207,7 @@ auto ElementwiseScalarOperation(T1 left, Tensor<T2, 2> const& right)
     using ResultType = std::common_type_t<T1, T2>;
     Tensor<ResultType, 2> result(left.Shape());
     Operation operation;
-    Dispatch(left.Shape()[0], left.Shape()[1], [&](size_t y, size_t x)
+    DispatchElement(left.Shape()[0], left.Shape()[1], [&](size_t y, size_t x)
     {
         result(y, x) = operation(left, right(y, x));
     });
