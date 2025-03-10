@@ -1,8 +1,10 @@
 #pragma once
 
+
 #include <Dispatch.hpp>
 #include <Tensor.hpp>
 
+#include "InstructionSet.hpp"
 #include "ColorMap.hpp"
 
 #include <emmintrin.h>
@@ -74,9 +76,9 @@ auto MandelbrotGeneric(size_t height, size_t width, Colormap colormap) -> Tensor
     return mandelbrot;
 }
 
-auto MandelbrotSSE2(size_t height, size_t width, Colormap colormap) -> Tensor<uint8_t, 3>
+auto MandelbrotSSE(size_t height, size_t width, Colormap colormap) -> Tensor<uint8_t, 3>
 {
-#if defined(_M_X64) || defined(__x86_64__) || (__SSE2__)
+#if __SUPPORTS_SSE__
     auto mandelbrot = Tensor<uint8_t, 3>({height, width, 3});
 
     // apply the following operation to every row in the image
@@ -252,40 +254,16 @@ auto MandelbrotSSE2(size_t height, size_t width, Colormap colormap) -> Tensor<ui
 #endif
 }
 
-#ifdef _M_X64
-    #include <intrin.h>
-#elif defined(__GNUC__) || defined(__clang__)
-    #include <cpuid.h>
-#endif
-
-bool SupportsSSE2() {
-#if defined(_MSC_VER)
-    int cpuInfo[4] = {0};
-    __cpuid(cpuInfo, 1);
-    // Bit 26 of EDX indicates SSE2 support
-    return (cpuInfo[3] & (1 << 26)) != 0;
-#elif defined(__GNUC__) || defined(__clang__)
-    #if defined(__i386__) || defined(__x86_64__)
-    unsigned int eax, ebx, ecx, edx;
-    if (!__get_cpuid(1, &eax, &ebx, &ecx, &edx)) {
-        throw std::runtime_error("CPUID not available");
-    }
-    // bit_SSE2 is defined in <cpuid.h> as (1 << 26)
-    return (edx & bit_SSE2) != 0;
-    #endif
-#else
-    throw std::runtime_error("Unsupported compiler/platform for SSE2 detection");
-#endif
-}
-
 auto Mandelbrot(size_t height, size_t width, Colormap colormap) -> Tensor<uint8_t, 3>
 {
-    if (SupportsSSE2())
+    if (SupportsSSE())
     {
-        return MandelbrotSSE2(height, width, colormap);
+        std::cout << "Running Mandelbrot with SSE instruction set." << std::endl;
+        return MandelbrotSSE(height, width, colormap);
     }
     else
     {
+        std::cout << "Running Mandelbrot with generic instruction set." << std::endl;
         return MandelbrotGeneric(height, width, colormap);
     }
 }
