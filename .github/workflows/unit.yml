@@ -33,7 +33,12 @@ jobs:
               run: |
                 cmake --build --preset release
 
-            - name: Test
+            - name: Test (Unit)
               shell: bash
               run: |
                 ctest --preset release
+
+            - name: Test (Smoke)
+              shell: bash
+              run: |
+                cmake --build --preset release --target smoke_test
