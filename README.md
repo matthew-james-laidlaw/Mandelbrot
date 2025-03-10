@@ -6,6 +6,8 @@ A mandelbrot visualizing application built on top of a (somewhat) generic 1D, 2D
 
 *Mostly self-implemented with external libraries pulled in for argument parsing, unit testing, and image encoding (e.g., [lodepng](https://github.com/lvandeve/lodepng)).*
 
+![mandelbrot](docs/example.png "Mandelbrot")
+
 ## What It Is
 
 - **Command Line Tool:**  
