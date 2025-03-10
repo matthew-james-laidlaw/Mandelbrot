@@ -6,3 +6,5 @@ build
 *.ppm
 *.jpg
 *.png
+
+!/docs/mandelbrot.png
