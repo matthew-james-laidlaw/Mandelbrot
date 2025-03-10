@@ -5,6 +5,8 @@
 
 #include "ColorMap.hpp"
 
+#include <emmintrin.h>
+
 static constexpr size_t k_max_iterations = 100;
 
 // bounds of the complex plane to visualize
