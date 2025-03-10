@@ -255,7 +255,8 @@ auto MandelbrotSSE(size_t height, size_t width, Colormap colormap) -> Tensor<uin
 auto MandelbrotNEON(size_t height, size_t width, Colormap colormap) -> Tensor<uint8_t, 3>
 {
 #if __SUPPORTS_NEON__
-    throw std::runtime_error("NEON not implemented");
+    std::cout << "WARNING: NEON not yet implemented, falling back to generic version" << std::endl;
+    return MandelbrotGeneric(height, width, colormap);
 #else
     throw std::runtime_error("this binary was not compiled with NEON support");
 #endif
