@@ -191,7 +191,7 @@ auto MandelbrotSSE2(size_t height, size_t width, Colormap colormap) -> Tensor<ui
                     float normalized = (iteration + 1 - nu) / k_max_iterations;
 
                     // map normalized value to colormap index (range 0 - 255)
-                    size_t index = std::clamp(static_cast<size_t>(normalized * 255.0f), 0ull, 255ull);
+                    size_t index = std::clamp(static_cast<size_t>(normalized * 255.0f), size_t(0), size_t(255));
 
                     // retrieve rgb color from colormap palette
                     auto [red, green, blue] = GetColormapPalette(colormap)[index];
@@ -230,7 +230,7 @@ auto MandelbrotSSE2(size_t height, size_t width, Colormap colormap) -> Tensor<ui
             {
                 float nu                = std::log(std::log(std::abs(z))) / std::log(2.0f);
                 float normalized        = (iteration + 1 - nu) / k_max_iterations;
-                size_t index            = std::clamp(static_cast<size_t>(normalized * 255.0f), 0ull, 255ull);
+                size_t index            = std::clamp(static_cast<size_t>(normalized * 255.0f), size_t(0), size_t(255));
                 auto [red, green, blue] = GetColormapPalette(colormap)[index];
 
                 mandelbrot(y, x, 0) = red;
