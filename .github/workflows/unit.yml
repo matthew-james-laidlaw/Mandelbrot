@@ -26,6 +26,12 @@ jobs:
                 arch: x64-windows
 
         steps:
+
+            - name: Check Processor Features
+              shell: bash
+              run: |
+                lscpu
+
             - name: Checkout source
               uses: actions/checkout@v3
               with:
