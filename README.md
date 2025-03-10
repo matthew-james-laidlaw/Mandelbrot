@@ -2,7 +2,7 @@
 
 [![unit](https://github.com/matthew-james-laidlaw/Matrix/actions/workflows/unit.yml/badge.svg?branch=main)](https://github.com/matthew-james-laidlaw/Matrix/actions/workflows/unit.yml)
 
-A mandelbrot visualizing application built on top of a (somewhat) generic 1D, 2D, and 3D tensor library. See [user-guide.md](docs/user-guid.md) for detailed build & usage instructions.
+A mandelbrot visualizing application built on top of a generic 1D, 2D, and 3D tensor library. Uses C++20. See [user-guide.md](docs/user-guid.md) for detailed build & usage instructions.
 
 *Mostly self-implemented with external libraries pulled in for argument parsing, unit testing, and image encoding (e.g., [lodepng](https://github.com/lvandeve/lodepng)).*
 
@@ -22,7 +22,7 @@ A mandelbrot visualizing application built on top of a (somewhat) generic 1D, 2D
 ## Future Work
 
 - Implement NEON Mandelbrot calculation.
-- Package tensor library for consumption as a library (feel free to pull it in as a submodule and try, but it's not formally packaged yet).
+- Formally package the tensor code for consumption as a library (feel free to pull this project in as a cmake subdirectory and try using the `tensor` target).
 - Benchmark between x64/arm64, generic/SSE/NEON, and different threading configurations.
 - Implement [expression templates](https://en.wikipedia.org/wiki/Expression_templates) for lazy evaluation of matrix arithmetic, and to avoid storage of intermediate results.
 - Implement Mandelbrot calculation with matrix arithmetic instead of a per-element kernel and compare performance.
