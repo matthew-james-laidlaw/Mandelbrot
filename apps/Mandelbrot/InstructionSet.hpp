@@ -94,7 +94,7 @@ bool SupportsNEON_Linux()
     {
         if (strncmp(line, "Features", 8) == 0)
         {
-            has_neon = (strstr(line, " neon ") != nullptr);
+            has_neon = (strstr(line, " asimd ") != nullptr);
             break;
         }
     }
