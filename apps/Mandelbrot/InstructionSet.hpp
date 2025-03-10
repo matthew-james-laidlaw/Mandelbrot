@@ -23,7 +23,9 @@
 #include <sys/sysctl.h>
 #include <unistd.h>
 
-#include <emmintrin.h>
+#if __SUPPORTS_SSE__
+    #include <emmintrin.h>
+#endif
 
 bool SupportsSSE_Apple()
 {
@@ -47,7 +49,11 @@ bool SupportsNEON_Apple()
 #include <string.h>
 #include <unistd.h>
 
-#include <emmintrin.h>
+#if __SUPPORTS_SSE__
+    #include <emmintrin.h>
+#elif __SUPPORTS_NEON__
+    #include <arm_neon.h>
+#endif
 
 bool SupportsSSE_Linux()
 {
