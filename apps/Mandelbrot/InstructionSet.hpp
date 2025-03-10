@@ -23,6 +23,8 @@
 #include <sys/sysctl.h>
 #include <unistd.h>
 
+#include <emmintrin.h>
+
 bool SupportsSSE_Apple()
 {
     int cpu_type;
@@ -44,6 +46,8 @@ bool SupportsNEON_Apple()
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
+
+#include <emmintrin.h>
 
 bool SupportsSSE_Linux()
 {
