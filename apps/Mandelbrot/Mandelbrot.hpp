@@ -52,7 +52,7 @@ auto MandelbrotGeneric(size_t height, size_t width, Colormap colormap) -> Tensor
             float normalized = (iteration + 1 - nu) / k_max_iterations;
 
             // map normalized value in range (0.0 - 1.0) to a colormap index in range (0 - 255)
-            size_t index = std::clamp(static_cast<size_t>(normalized * 255.0f), 0ull, 255ull);
+            size_t index = std::clamp(static_cast<size_t>(normalized * 255.0f), size_t(0), size_t(255));
 
             // get the corresponding RGB value from the palette
             auto [red, green, blue] = GetColormapPalette(colormap)[index];
