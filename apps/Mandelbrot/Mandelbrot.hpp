@@ -22,7 +22,7 @@ static constexpr float k_bailout_radius_squared = k_bailout_radius * k_bailout_r
  * @param[in] colormap The color palette to use.
  * @returns A 3D tensor (height x width x 3) representing an interleaved RGB image.
  */
-auto Mandelbrot(size_t height, size_t width, Colormap colormap) -> Tensor<uint8_t, 3>
+auto MandelbrotGeneric(size_t height, size_t width, Colormap colormap) -> Tensor<uint8_t, 3>
 {
     auto mandelbrot = Tensor<uint8_t, 3>({height, width, 3});
 
@@ -72,8 +72,9 @@ auto Mandelbrot(size_t height, size_t width, Colormap colormap) -> Tensor<uint8_
     return mandelbrot;
 }
 
-auto MandelbrotSIMD(size_t height, size_t width, Colormap colormap) -> Tensor<uint8_t, 3>
+auto MandelbrotSSE2(size_t height, size_t width, Colormap colormap) -> Tensor<uint8_t, 3>
 {
+#if defined(_M_X64) || defined(__x86_64__) || (__SSE2__)
     auto mandelbrot = Tensor<uint8_t, 3>({height, width, 3});
 
     // apply the following operation to every row in the image
@@ -244,4 +245,35 @@ auto MandelbrotSIMD(size_t height, size_t width, Colormap colormap) -> Tensor<ui
     });
 
     return mandelbrot;
+#else
+    throw std::runtime_error("this binary was not compiled with SSE2 support");
+#endif
+}
+
+#ifdef _MSC_VER
+    #include <intrin.h>
+#endif
+
+bool SupportsSSE2()
+{
+#ifdef _MSC_VER
+    int cpuInfo[4] = {0};
+    __cpuid(cpuInfo, 1);
+    // Bit 26 of EDX indicates SSE2 support
+    return (cpuInfo[3] & (1 << 26)) != 0;
+#else
+    throw std::runtime_error("this machine does not support SSE2");    
+#endif
+}
+
+auto Mandelbrot(size_t height, size_t width, Colormap colormap) -> Tensor<uint8_t, 3>
+{
+    if (SupportsSSE2())
+    {
+        return MandelbrotSSE2(height, width, colormap);
+    }
+    else
+    {
+        return MandelbrotGeneric(height, width, colormap);
+    }
 }

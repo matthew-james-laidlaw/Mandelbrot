@@ -45,7 +45,7 @@ auto Main(int argc, char** argv) -> int
 
     auto [mandelbrot, mandelbrot_elapsed] = Time([&]()
     {
-        return MandelbrotSIMD(height, width, colormap);
+        return Mandelbrot(height, width, colormap);
     });
 
     auto encode_elapsed = Time([&]()
