@@ -252,19 +252,29 @@ auto MandelbrotSSE2(size_t height, size_t width, Colormap colormap) -> Tensor<ui
 #endif
 }
 
-#ifdef _MSC_VER
+#ifdef _M_X64
     #include <intrin.h>
+#elif defined(__GNUC__) || defined(__clang__)
+    #include <cpuid.h>
 #endif
 
-bool SupportsSSE2()
-{
-#ifdef _MSC_VER
+bool SupportsSSE2() {
+#if defined(_MSC_VER)
     int cpuInfo[4] = {0};
     __cpuid(cpuInfo, 1);
     // Bit 26 of EDX indicates SSE2 support
     return (cpuInfo[3] & (1 << 26)) != 0;
+#elif defined(__GNUC__) || defined(__clang__)
+    #if defined(__i386__) || defined(__x86_64__)
+    unsigned int eax, ebx, ecx, edx;
+    if (!__get_cpuid(1, &eax, &ebx, &ecx, &edx)) {
+        throw std::runtime_error("CPUID not available");
+    }
+    // bit_SSE2 is defined in <cpuid.h> as (1 << 26)
+    return (edx & bit_SSE2) != 0;
+    #endif
 #else
-    throw std::runtime_error("this machine does not support SSE2");    
+    throw std::runtime_error("Unsupported compiler/platform for SSE2 detection");
 #endif
 }
 
