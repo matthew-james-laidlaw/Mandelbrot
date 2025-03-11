@@ -23,9 +23,8 @@ A Mandelbrot visualizing application built on top of a generic 1D, 2D, and 3D te
 
 - Implement NEON Mandelbrot calculation.
 - Formally package the tensor code for consumption as a library (feel free to pull this project in as a cmake subdirectory and try using the `tensor` target).
-- Benchmark between x64/arm64, generic/SSE/NEON, and different threading configurations.
+- Benchmark between generic/SSE/NEON implementations and different threading configurations.
 - Implement [expression templates](https://en.wikipedia.org/wiki/Expression_templates) for lazy evaluation of matrix arithmetic, and to avoid storage of intermediate results.
-- Implement Mandelbrot calculation with matrix arithmetic instead of a per-element kernel and compare performance.
 
 # Resources
 * [Mandelbrot Plotting Algorithms](https://en.wikipedia.org/wiki/Plotting_algorithms_for_the_Mandelbrot_set#Continuous_(smooth)_coloring)
