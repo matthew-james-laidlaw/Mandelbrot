@@ -159,19 +159,19 @@ private:
 template <typename Operation, Number T1, Number T2, size_t N>
 auto ElementwiseBinaryOperation(Tensor<T1, N> const& left, Tensor<T2, N> const& right)
 {
-    static_assert("matrix-matrix arithmetic is not defined for orders other than 2");
+    static_assert("tensor arithmetic is only defined for matrices (Order == 2)");
 }
 
 template <typename Operation, Number T1, Number T2, size_t N>
 auto ElementwiseScalarOperation(Tensor<T1, N> const& left, T2 right)
 {
-    static_assert("scalar-matrix arithmetic is not defined for orders other than 2");
+    static_assert("tensor arithmetic is only defined for matrices (Order == 2)");
 }
 
 template <typename Operation, Number T1, Number T2, size_t N>
 auto ElementwiseScalarOperation(T1 left, Tensor<T2, N> const& right)
 {
-    static_assert("scalar-matrix arithmetic is not defined for orders other than 2");
+    static_assert("tensor arithmetic is only defined for matrices (Order == 2)");
 }
 
 template <typename Operation, Number T1, Number T2>
