@@ -2,7 +2,7 @@
 
 [![unit](https://github.com/matthew-james-laidlaw/Matrix/actions/workflows/unit.yml/badge.svg?branch=main)](https://github.com/matthew-james-laidlaw/Matrix/actions/workflows/unit.yml)
 
-A mandelbrot visualizing application built on top of a generic 1D, 2D, and 3D tensor library. Uses C++20. See [user-guide.md](docs/user-guid.md) for detailed build & usage instructions.
+A Mandelbrot visualizing application built on top of a generic 1D, 2D, and 3D tensor library. Uses C++20. See [user-guide.md](docs/user-guid.md) for detailed build & usage instructions.
 
 *Mostly self-implemented with external libraries pulled in for argument parsing, unit testing, and image encoding (e.g., [lodepng](https://github.com/lvandeve/lodepng)).*
 
