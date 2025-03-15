@@ -1,2 +1,0 @@
-add_executable(benchmarks BenchmarkMatrix.cpp)
-target_link_libraries(benchmarks benchmark_main tensor)

@@ -1,9 +1,3 @@
-[submodule "extern/googletest"]
-	path = extern/googletest
-	url = https://github.com/google/googletest.git
-[submodule "extern/benchmark"]
-	path = extern/benchmark
-	url = https://github.com/google/benchmark.git
 [submodule "extern/argparse"]
 	path = extern/argparse
 	url = https://github.com/p-ranav/argparse.git

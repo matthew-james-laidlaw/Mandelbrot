@@ -12,11 +12,11 @@ static constexpr size_t k_max_iterations = 100;
 
 // bounds of the complex plane to visualize
 static constexpr float k_real_start = -2.5f;
-static constexpr float k_real_stop  = 1.0f;
+static constexpr float k_real_stop = 1.0f;
 static constexpr float k_imag_start = -1.0f;
-static constexpr float k_imag_stop  = 1.0f;
+static constexpr float k_imag_stop = 1.0f;
 
-static constexpr float k_bailout_radius         = 256.0f;
+static constexpr float k_bailout_radius = 256.0f;
 static constexpr float k_bailout_radius_squared = k_bailout_radius * k_bailout_radius;
 
 /** @brief Generate a visualization of the Mandelbrot set using the given color palette.
@@ -51,7 +51,7 @@ auto MandelbrotGeneric(size_t height, size_t width, Colormap colormap) -> Tensor
         if (iteration < k_max_iterations) // points that escape are colored based on the number of iterations it took to escape
         {
             // apply smoothing to reduce banding
-            float nu         = std::log(std::log(std::abs(z))) / std::log(2.0f);
+            float nu = std::log(std::log(std::abs(z))) / std::log(2.0f);
             float normalized = (iteration + 1 - nu) / k_max_iterations;
 
             // map normalized value in range (0.0 - 1.0) to a colormap index in range (0 - 255)
@@ -60,15 +60,15 @@ auto MandelbrotGeneric(size_t height, size_t width, Colormap colormap) -> Tensor
             // get the corresponding RGB value from the palette
             auto [red, green, blue] = GetColormapPalette(colormap)[index];
 
-            mandelbrot(y, x, 0) = red;
-            mandelbrot(y, x, 1) = green;
-            mandelbrot(y, x, 2) = blue;
+            mandelbrot({y, x, 0}) = red;
+            mandelbrot({y, x, 1}) = green;
+            mandelbrot({y, x, 2}) = blue;
         }
         else // points that do not escape are colored black
         {
-            mandelbrot(y, x, 0) = 0;
-            mandelbrot(y, x, 1) = 0;
-            mandelbrot(y, x, 2) = 0;
+            mandelbrot({y, x, 0}) = 0;
+            mandelbrot({y, x, 1}) = 0;
+            mandelbrot({y, x, 2}) = 0;
         }
     });
 
@@ -91,16 +91,16 @@ auto MandelbrotSSE(size_t height, size_t width, Colormap colormap) -> Tensor<uin
         {
             // compute real component for current set of four pixels
             // float real[i] = k_real_start + (static_cast<float>(x[i]) / (width - 1)) * (k_real_stop - k_real_start);
-            __m128 v_real_start      = _mm_set1_ps(k_real_start);
-            __m128 v_real_stop       = _mm_set1_ps(k_real_stop);
-            __m128 v_real_range      = _mm_sub_ps(v_real_stop, v_real_start);
+            __m128 v_real_start = _mm_set1_ps(k_real_start);
+            __m128 v_real_stop = _mm_set1_ps(k_real_stop);
+            __m128 v_real_range = _mm_sub_ps(v_real_stop, v_real_start);
             __m128 v_width_minus_one = _mm_set1_ps(static_cast<float>(width - 1));
-            __m128 v_indices         = _mm_setr_ps(static_cast<float>(x_start + 0),
-                                                   static_cast<float>(x_start + 1),
-                                                   static_cast<float>(x_start + 2),
-                                                   static_cast<float>(x_start + 3));
-            __m128 v_ratio           = _mm_div_ps(v_indices, v_width_minus_one);
-            __m128 v_c_real          = _mm_add_ps(v_real_start, _mm_mul_ps(v_ratio, v_real_range));
+            __m128 v_indices = _mm_setr_ps(static_cast<float>(x_start + 0),
+                                           static_cast<float>(x_start + 1),
+                                           static_cast<float>(x_start + 2),
+                                           static_cast<float>(x_start + 3));
+            __m128 v_ratio = _mm_div_ps(v_indices, v_width_minus_one);
+            __m128 v_c_real = _mm_add_ps(v_real_start, _mm_mul_ps(v_ratio, v_real_range));
 
             // set imaginary component of c to constant value for current row
             __m128 v_c_imag = _mm_set1_ps(imag);
@@ -111,7 +111,7 @@ auto MandelbrotSSE(size_t height, size_t width, Colormap colormap) -> Tensor<uin
 
             // initialize iteration counts to 0 and set maximum iterations
             __m128i vi_iterations = _mm_setzero_si128();
-            __m128i vi_max_iters  = _mm_set1_epi32(k_max_iterations);
+            __m128i vi_max_iters = _mm_set1_epi32(k_max_iterations);
 
             // set bailout squared threshold
             __m128 v_bailout_sq = _mm_set1_ps(k_bailout_radius_squared);
@@ -134,8 +134,8 @@ auto MandelbrotSSE(size_t height, size_t width, Colormap colormap) -> Tensor<uin
 
             while (true)
             {
-                __m128 v_z_real_sq   = _mm_mul_ps(v_z_real, v_z_real);
-                __m128 v_z_imag_sq   = _mm_mul_ps(v_z_imag, v_z_imag);
+                __m128 v_z_real_sq = _mm_mul_ps(v_z_real, v_z_real);
+                __m128 v_z_imag_sq = _mm_mul_ps(v_z_imag, v_z_imag);
                 __m128 v_z_magnitude = _mm_add_ps(v_z_real_sq, v_z_imag_sq);
 
                 // determine lanes where magnitude is less than bailout
@@ -143,7 +143,7 @@ auto MandelbrotSSE(size_t height, size_t width, Colormap colormap) -> Tensor<uin
 
                 // determine lanes where iteration count is below maximum
                 __m128i vi_iter_lt_max = _mm_cmplt_epi32(vi_iterations, vi_max_iters);
-                __m128 v_iter_lt_max   = _mm_castsi128_ps(vi_iter_lt_max);
+                __m128 v_iter_lt_max = _mm_castsi128_ps(vi_iter_lt_max);
 
                 // combine masks to find lanes that are still active
                 __m128 v_active = _mm_and_ps(v_within_bailout, v_iter_lt_max);
@@ -157,9 +157,9 @@ auto MandelbrotSSE(size_t height, size_t width, Colormap colormap) -> Tensor<uin
 
                 // increment iteration counts for lanes within bailout
                 __m128i vi_within_bailout_int = _mm_castps_si128(v_within_bailout);
-                __m128i vi_one                = _mm_set1_epi32(1);
-                __m128i vi_increment          = _mm_and_si128(vi_within_bailout_int, vi_one);
-                vi_iterations                 = _mm_add_epi32(vi_iterations, vi_increment);
+                __m128i vi_one = _mm_set1_epi32(1);
+                __m128i vi_increment = _mm_and_si128(vi_within_bailout_int, vi_one);
+                vi_iterations = _mm_add_epi32(vi_iterations, vi_increment);
 
                 // compute new z values using Mandelbrot formula: z = z^2 + c
                 __m128 v_new_z_real = _mm_add_ps(_mm_sub_ps(v_z_real_sq, v_z_imag_sq), v_c_real);
@@ -188,7 +188,7 @@ auto MandelbrotSSE(size_t height, size_t width, Colormap colormap) -> Tensor<uin
                 if (iteration < k_max_iterations) // points that escape are colored based on the number of iterations it took to escape
                 {
                     // apply smoothing to reduce banding
-                    float nu         = std::log(std::log(std::abs(z))) / std::log(2.0f);
+                    float nu = std::log(std::log(std::abs(z))) / std::log(2.0f);
                     float normalized = (iteration + 1 - nu) / k_max_iterations;
 
                     // map normalized value to colormap index (range 0 - 255)
@@ -197,15 +197,15 @@ auto MandelbrotSSE(size_t height, size_t width, Colormap colormap) -> Tensor<uin
                     // retrieve rgb color from colormap palette
                     auto [red, green, blue] = GetColormapPalette(colormap)[index];
 
-                    mandelbrot(y, x, 0) = red;
-                    mandelbrot(y, x, 1) = green;
-                    mandelbrot(y, x, 2) = blue;
+                    mandelbrot({y, x, 0}) = red;
+                    mandelbrot({y, x, 1}) = green;
+                    mandelbrot({y, x, 2}) = blue;
                 }
                 else // color non-escaped points as black
                 {
-                    mandelbrot(y, x, 0) = 0;
-                    mandelbrot(y, x, 1) = 0;
-                    mandelbrot(y, x, 2) = 0;
+                    mandelbrot({y, x, 0}) = 0;
+                    mandelbrot({y, x, 1}) = 0;
+                    mandelbrot({y, x, 2}) = 0;
                 }
             }
         }
@@ -215,7 +215,7 @@ auto MandelbrotSSE(size_t height, size_t width, Colormap colormap) -> Tensor<uin
         {
             // compute real component for current pixel
             float ratio = static_cast<float>(x) / (width - 1);
-            float real  = k_real_start + ratio * (k_real_stop - k_real_start);
+            float real = k_real_start + ratio * (k_real_stop - k_real_start);
             std::complex<float> c(real, imag);
             std::complex<float> z(0, 0);
             size_t iteration = 0;
@@ -229,20 +229,20 @@ auto MandelbrotSSE(size_t height, size_t width, Colormap colormap) -> Tensor<uin
 
             if (iteration < k_max_iterations) // point escaped; compute color based on iteration count
             {
-                float nu                = std::log(std::log(std::abs(z))) / std::log(2.0f);
-                float normalized        = (iteration + 1 - nu) / k_max_iterations;
-                size_t index            = std::clamp(static_cast<size_t>(normalized * 255.0f), size_t(0), size_t(255));
+                float nu = std::log(std::log(std::abs(z))) / std::log(2.0f);
+                float normalized = (iteration + 1 - nu) / k_max_iterations;
+                size_t index = std::clamp(static_cast<size_t>(normalized * 255.0f), size_t(0), size_t(255));
                 auto [red, green, blue] = GetColormapPalette(colormap)[index];
 
-                mandelbrot(y, x, 0) = red;
-                mandelbrot(y, x, 1) = green;
-                mandelbrot(y, x, 2) = blue;
+                mandelbrot({y, x, 0}) = red;
+                mandelbrot({y, x, 1}) = green;
+                mandelbrot({y, x, 2}) = blue;
             }
             else // point did not escape; color black
             {
-                mandelbrot(y, x, 0) = 0;
-                mandelbrot(y, x, 1) = 0;
-                mandelbrot(y, x, 2) = 0;
+                mandelbrot({y, x, 0}) = 0;
+                mandelbrot({y, x, 1}) = 0;
+                mandelbrot({y, x, 2}) = 0;
             }
         }
     });

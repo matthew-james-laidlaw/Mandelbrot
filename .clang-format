@@ -1,6 +1,5 @@
 ---
 AccessModifierOffset: -4
-AlignConsecutiveAssignments: true
 AlignOperands: AlignAfterOperator
 AllowShortLambdasOnASingleLine: Empty
 BreakBeforeBraces: Custom
