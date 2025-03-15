@@ -10,3 +10,6 @@
 [submodule "extern/lodepng"]
 	path = extern/lodepng
 	url = https://github.com/lvandeve/lodepng.git
+[submodule "extern/tensor"]
+	path = extern/tensor
+	url = https://github.com/matthew-james-laidlaw/Tensor.git

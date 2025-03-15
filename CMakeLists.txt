@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.29.3)
 
-project(MATRIX CXX)
+project(TENSOR CXX)
 
 include(GoogleTest)
 enable_testing()

@@ -6,6 +6,8 @@
 #include "ColorMap.hpp"
 #include "InstructionSet.hpp"
 
+#include <complex>
+
 static constexpr size_t k_max_iterations = 100;
 
 // bounds of the complex plane to visualize
@@ -85,7 +87,7 @@ auto MandelbrotSSE(size_t height, size_t width, Colormap colormap) -> Tensor<uin
         float imag = k_imag_start + (static_cast<float>(y) / (height - 1)) * (k_imag_stop - k_imag_start);
 
         // process pixels in chunks of four
-        for (size_t x_start = 0; x_start < width; x_start += 4)
+        for (size_t x_start = 0; x_start < width - (width % 4); x_start += 4)
         {
             // compute real component for current set of four pixels
             // float real[i] = k_real_start + (static_cast<float>(x[i]) / (width - 1)) * (k_real_stop - k_real_start);

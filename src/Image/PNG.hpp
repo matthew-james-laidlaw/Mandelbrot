@@ -8,7 +8,7 @@
 
 auto EncodePng(const std::string& filename, Tensor<uint8_t, 3> const& rgb) -> void
 {
-    auto [height, width, channels] = rgb.Shape();
+    auto [height, width, channels] = rgb.Dimensions();
     Expect(channels == 3, "error: input tensor must have 3 channels (RGB)");
 
     auto error = lodepng::encode(filename, rgb.Data(), width, height, LCT_RGB, 8);
