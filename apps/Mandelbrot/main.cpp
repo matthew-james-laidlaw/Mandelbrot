@@ -40,8 +40,8 @@ auto Main(int argc, char** argv) -> int
     auto colormap = GetColormapByName(colormap_name);
 
     // 4k resolution
-    const size_t height = 2163;
-    const size_t width  = 3843;
+    const size_t height = 2160;
+    const size_t width  = 3840;
 
     auto [mandelbrot, mandelbrot_elapsed] = Time([&]()
     {
